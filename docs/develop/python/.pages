@@ -1,0 +1,7 @@
+nav:
+  - "Python Overview": index.md
+  - "Write an MCP Server in Python": developing-your-mcp-server-python.md
+  - "Project Structure": structure.md
+  - "Testing": testing.md
+  - "Packaging": packaging.md
+  - "Best Practices": best-practices.md

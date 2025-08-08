@@ -1,0 +1,7 @@
+nav:
+  - "Security Guide": index.md
+  - "Authentication": authentication.md
+  - "Authorization": authorization.md
+  - "Secrets Management": secrets.md
+  - "Input Validation": validation.md
+  - "Security Scanning": scanning.md

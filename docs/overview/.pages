@@ -1,0 +1,6 @@
+nav:
+  - "Introduction": index.md
+  - "Architecture": architecture.md
+  - "Core Concepts": core-concepts.md
+  - "Standards": standards.md
+  - "Getting Started": getting-started.md

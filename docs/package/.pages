@@ -1,0 +1,6 @@
+nav:
+  - "Packaging Guide": index.md
+  - "Python Packaging": python.md
+  - "NPM Packaging": npm.md
+  - "Container Packaging": containers.md
+  - "Distribution": distribution.md

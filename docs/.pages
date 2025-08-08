@@ -1,0 +1,13 @@
+nav:
+  - "🏠 Home": index.md
+  - "🧭 Overview": overview
+  - "⭐ Best Practices": best-practice
+  - "💻 Develop": develop
+  - "🧪 Test": test
+  - "📦 Package": package
+  - "🚀 Deploy": deploy
+  - "⚙️ Operate": operate
+  - "🔧 Manage": manage
+  - "🛡️ Secure": secure
+  - "🔌 Use": use
+  - "❓ FAQ": faq

@@ -1,0 +1,7 @@
+nav:
+  - "Operations Guide": index.md
+  - "Monitoring": monitoring.md
+  - "Logging": logging.md
+  - "Performance": performance.md
+  - "Scaling": scaling.md
+  - "Incident Response": incidents.md

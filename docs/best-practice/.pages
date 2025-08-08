@@ -1,0 +1,4 @@
+nav:
+  - "Best Practices Guide": mcp-best-practices.md
+  - "When to Use MCP": when-to-use-mcp.md
+  - "Design Principles": principles.md
