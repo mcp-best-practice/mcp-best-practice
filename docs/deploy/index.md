@@ -4,7 +4,61 @@
 
 This guide covers deployment strategies, platforms, and best practices for running MCP servers in production environments.
 
-## Deployment Strategies
+## Deployment Patterns
+
+### Local vs Remote Deployment
+
+#### Local Deployment
+- **Use Cases**: Development, testing, trusted environments
+- **Transport**: STDIO with optional HTTP wrapper
+- **Security**: Container isolation, syscall restrictions
+- **Benefits**: Lower latency, offline capability
+
+#### Remote Deployment  
+- **Use Cases**: Production, shared services, untrusted environments
+- **Transport**: Streamable HTTP (recommended)
+- **Security**: TLS, authentication, network isolation
+- **Benefits**: Scalability, centralized management
+
+### Deployment Strategies
+
+#### Rainbow Rollout Strategy
+Gradual deployment across multiple environments:
+```yaml
+environments:
+  development:
+    percentage: 100%
+    duration: immediate
+    validation: basic_tests
+    
+  staging:
+    percentage: 100% 
+    duration: 2h
+    validation: integration_tests
+    
+  canary:
+    percentage: 5%
+    duration: 4h
+    validation: performance_monitoring
+    
+  production:
+    percentage: 100%
+    duration: 24h
+    validation: full_monitoring
+```
+
+#### High Availability Deployment
+```yaml
+high_availability:
+  replicas: 3
+  anti_affinity: true
+  zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+  load_balancing: round_robin
+  health_checks:
+    enabled: true
+    interval: 30s
+    failure_threshold: 3
+```
 
 ### Blue-Green Deployment
 Switch between two identical production environments:
@@ -46,6 +100,64 @@ deployment:
   strategy: rolling
   max_surge: 1
   max_unavailable: 0
+```
+
+## Container Packaging
+
+### Signed Container Images
+Always use containers signed by trusted providers:
+
+```bash
+# Sign container with cosign
+cosign sign --key cosign.key mcp-server:latest
+
+# Verify container signature
+cosign verify --key cosign.pub mcp-server:latest
+
+# Use admission controllers to enforce signature verification
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Policy
+metadata:
+  name: require-signed-images
+spec:
+  rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create"]
+  admissionReviewVersions: ["v1", "v1beta1"]
+  sideEffects: None
+  rules:
+  - operations: ["CREATE"]
+    resources: ["pods"]
+    admissionReviewVersions: ["v1"]
+EOF
+```
+
+### Trusted Repositories
+Download MCP servers only from verified sources:
+
+- **Official registries**: Docker Hub, ECR, GCR with verified publishers
+- **Organization registries**: Internal container registries with signing
+- **Curated catalogs**: Company-approved MCP server collections
+
+### Container Security
+```dockerfile
+# Multi-stage build for minimal attack surface
+FROM golang:1.21-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o server
+
+# Minimal runtime image
+FROM scratch
+COPY --from=builder /app/server /server
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+USER 10001:10001
+EXPOSE 8000
+ENTRYPOINT ["/server"]
 ```
 
 ## Deployment Platforms

@@ -8,17 +8,24 @@ Security is paramount when building MCP servers that interact with external syst
 
 ### Defense in Depth
 Implement multiple layers of security controls:
-1. **Network Security** - Firewalls, TLS, VPNs
+1. **Network Security** - Firewalls, TLS, VPNs, CORS
 2. **Application Security** - Input validation, output encoding
 3. **Data Security** - Encryption at rest and in transit
 4. **Access Control** - Authentication and authorization
 5. **Monitoring** - Logging, alerting, incident response
+6. **Container Security** - Signed containers, syscall restrictions
 
 ### Zero Trust Architecture
 - Never trust, always verify
 - Least privilege access
 - Assume breach mindset
 - Continuous verification
+
+### Network Security
+- **TLS**: Always use TLS in production
+- **CORS**: Configure proper Cross-Origin Resource Sharing policies
+- **Container Signing**: Only use containers signed by trusted providers
+- **Trusted Repositories**: Download MCP servers from verified sources only
 
 ## Common Security Threats
 
@@ -100,7 +107,45 @@ element.textContent = userInput;
 element.innerHTML = DOMPurify.sanitize(userInput);
 ```
 
-## Authentication Methods
+## Authentication and Authorization
+
+### OAuth 2.0 Implementation
+```python
+# OAuth flow implementation
+class OAuthHandler:
+    def __init__(self, client_id, client_secret):
+        self.client_id = client_id
+        self.client_secret = client_secret
+    
+    def get_authorization_url(self, scopes: List[str]) -> str:
+        # OAuth scopes should be granular - separate read/write permissions
+        scope_string = " ".join(scopes)
+        return f"https://auth.provider.com/oauth/authorize?client_id={self.client_id}&scope={scope_string}&response_type=code"
+    
+    def exchange_code_for_token(self, code: str) -> dict:
+        # Token exchange implementation
+        # Include scope validation and token storage
+        pass
+```
+
+### OAuth Scopes Strategy
+- **Granular Permissions**: Use separate scopes for read and write operations
+- **Service-Specific**: Different scopes for each service the MCP server connects to
+- **Principle of Least Privilege**: Request minimal scopes needed
+
+### Dynamic Client Registration
+```python
+# Support dynamic OAuth client registration
+def register_oauth_client(client_info: dict) -> dict:
+    # Validate client information
+    # Register with OAuth provider
+    # Return client credentials
+    return {
+        "client_id": generated_id,
+        "client_secret": generated_secret,
+        "registration_access_token": access_token
+    }
+```
 
 ### API Key Authentication
 ```python
@@ -245,6 +290,83 @@ trivy image my-mcp-server:latest
 # Grype
 grype my-mcp-server:latest
 ```
+
+### Static Code Analysis (SAST)
+```bash
+# Python
+bandit -r src/
+semgrep --config=auto src/
+
+# JavaScript/TypeScript
+eslint --ext .js,.ts src/
+npm audit
+
+# Go
+gosec ./...
+staticcheck ./...
+```
+
+## Container Security
+
+### Secure Container Practices
+- **Minimal Base Images**: Use distroless or minimal base images
+- **Non-root Users**: Run containers as non-root users
+- **Read-only Filesystems**: Mount filesystems as read-only when possible
+- **Syscall Filtering**: Restrict system calls using seccomp profiles
+
+### Container Signing
+```bash
+# Sign container images
+cosign sign my-mcp-server:latest
+
+# Verify signatures
+cosign verify --key cosign.pub my-mcp-server:latest
+```
+
+### Secure Dockerfile
+```dockerfile
+FROM gcr.io/distroless/python3-debian11
+
+# Create non-root user
+USER 10001:10001
+
+# Copy application
+COPY --chown=10001:10001 src/ /app/src/
+
+# Set read-only root filesystem
+USER 10001
+WORKDIR /app
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["python", "-m", "src.server"]
+```
+
+## Production Security Checklist
+
+### Minimum Requirements for Production
+
+#### Server-side (HTTP Transport)
+- [ ] **Hosted by trusted provider** with security certifications
+- [ ] **TLS/SSL enabled** with valid certificates
+- [ ] **Rate limiting** implemented
+- [ ] **Input validation** on all endpoints
+- [ ] **Authentication** required for all operations
+- [ ] **Authorization** checks implemented
+- [ ] **Logging and monitoring** configured
+- [ ] **Security headers** implemented
+- [ ] **Container signed** by trusted authority
+- [ ] **CORS policies** properly configured
+
+#### Client-side (STDIO Transport)
+- [ ] **Container signed** by trusted provider
+- [ ] **Minimal container** with no unnecessary tools
+- [ ] **Syscall restrictions** implemented
+- [ ] **Read-only filesystem** where possible
+- [ ] **Resource limits** configured
+- [ ] **Network isolation** when appropriate
 
 ## Incident Response
 

@@ -7,12 +7,19 @@ These fundamental principles guide the design and implementation of effective MC
 ## 1. Single Responsibility Principle
 
 ### Definition
-Each MCP server should have one clear, well-defined purpose and focus on a specific domain or service.
+Each MCP server should have one clear, well-defined purpose and focus on a specific problem area and authentication domain.
 
 ### Guidelines
 - **One Domain Per Server**: GitHub server, Database server, Email server
+- **Single Auth Domain**: All tools should use the same authentication mechanism
 - **Cohesive Functionality**: All tools within a server should be related
 - **Clear Boundaries**: Easy to explain what the server does in one sentence
+
+### Size and Scope Guidelines
+- **Problem Area Focus**: Restrict to one problem area (e.g., file management, API integration)
+- **Authentication Boundary**: Tools should share the same authentication requirements
+- **Single Tool Scope**: Each tool should have a focused, single purpose
+- **Avoid Mega-Servers**: Don't create "everything" servers that handle multiple domains
 
 ### ✅ Good Examples
 ```
@@ -220,6 +227,8 @@ Implement security best practices as the default behavior, not as an optional fe
 - **Least Privilege**: Request minimal necessary permissions
 - **No Secrets in Logs**: Never log sensitive information
 - **Secure Defaults**: Err on the side of being more restrictive
+- **Read-Only First**: For hosting providers, default to read-only mode when possible
+- **Tool Filtering**: Never provide tools that can cause irreversible changes in production
 
 ### Implementation
 ```python
@@ -303,7 +312,39 @@ async def process_request(name: str, arguments: dict):
         raise
 ```
 
-## 8. Resource Efficiency
+## 8. Protocol and Transport Selection
+
+### Definition
+Choose appropriate transport mechanisms based on deployment patterns and security requirements.
+
+### Transport Recommendations
+- **Recommended: Streamable HTTP**: Best for production deployments and remote servers
+- **Use STDIO with Wrapper**: For local deployments, wrap STDIO to support Streamable HTTP
+- **Avoid SSE**: Server-Sent Events transport is deprecated
+
+### Protocol Guidelines
+- **Remote Deployments**: Always use Streamable HTTP for network accessibility
+- **Local Deployments**: STDIO acceptable but consider HTTP wrapper for consistency
+- **Security**: HTTP transport enables better security controls (TLS, CORS)
+- **Scalability**: HTTP transport supports load balancing and proxying
+
+### Implementation Considerations
+```python
+# Support both transports with HTTP as primary
+class MCPServer:
+    def __init__(self, transport_type="http"):
+        self.transport_type = transport_type
+    
+    async def run(self, port=8000):
+        if self.transport_type == "http":
+            # Streamable HTTP transport (recommended)
+            await self.run_http_server(port)
+        elif self.transport_type == "stdio":
+            # STDIO with HTTP wrapper for compatibility
+            await self.run_stdio_with_http_wrapper()
+```
+
+## 9. Resource Efficiency
 
 ### Definition
 Use system resources responsibly and implement appropriate limits and cleanup.
