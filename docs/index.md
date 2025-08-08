@@ -1,5 +1,7 @@
 # MCP Best Practices Guide
 
+!!! warning "Work in Progress"
+
 ## Welcome to the Model Context Protocol Best Practices Guide
 
 This comprehensive guide provides best practices, patterns, and practical guidance for developing, deploying, and maintaining Model Context Protocol (MCP) servers in production environments.
@@ -15,7 +17,7 @@ This guide is organized into practical sections that cover the entire MCP server
 ### 🧭 **Overview**
 Get started with MCP fundamentals, architecture, and core concepts. Learn about the protocol standards and set up your first server.
 
-### ⭐ **Best Practices** 
+### ⭐ **Best Practices**
 Essential standards for building robust, maintainable MCP servers including project structure, dependency management, and coding conventions.
 
 ### 💻 **Development**

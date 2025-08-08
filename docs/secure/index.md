@@ -1,3 +1,8 @@
+---
+status: draft
+maintainer: Ian Molloy
+---
+
 # Security Guide
 
 ## Security Best Practices for MCP Servers
@@ -70,14 +75,14 @@ import re
 class SecureInput(BaseModel):
     email: str
     url: str
-    
+
     @validator('email')
     def validate_email(cls, v):
         pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         if not re.match(pattern, v):
             raise ValueError('Invalid email format')
         return v
-    
+
     @validator('url')
     def validate_url(cls, v):
         if not v.startswith(('http://', 'https://')):
@@ -116,12 +121,12 @@ class OAuthHandler:
     def __init__(self, client_id, client_secret):
         self.client_id = client_id
         self.client_secret = client_secret
-    
+
     def get_authorization_url(self, scopes: List[str]) -> str:
         # OAuth scopes should be granular - separate read/write permissions
         scope_string = " ".join(scopes)
         return f"https://auth.provider.com/oauth/authorize?client_id={self.client_id}&scope={scope_string}&response_type=code"
-    
+
     def exchange_code_for_token(self, code: str) -> dict:
         # Token exchange implementation
         # Include scope validation and token storage
@@ -188,16 +193,16 @@ def rate_limit(max_calls: int, period: int):
         def wrapper(request, *args, **kwargs):
             client_id = get_client_id(request)
             now = time.time()
-            
+
             # Clean old entries
             rate_limits[client_id] = [
-                t for t in rate_limits[client_id] 
+                t for t in rate_limits[client_id]
                 if now - t < period
             ]
-            
+
             if len(rate_limits[client_id]) >= max_calls:
                 raise RateLimitError('Rate limit exceeded')
-            
+
             rate_limits[client_id].append(now)
             return func(request, *args, **kwargs)
         return wrapper
