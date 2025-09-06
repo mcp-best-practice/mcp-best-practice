@@ -3,40 +3,59 @@
 ## Picking the Right SDK
 
 ### SDK Selection Criteria
-Choose an SDK based on these attributes:
+
+Use an official SDK when possible as it is most likely to stay current and spec‑compliant.
+Official SDKs are listed at the [official SDK page](https://modelcontextprotocol.io/docs/sdk).
+TypeScript and Python SDKs are currently further ahead in development
+than the others.
+
+The official Go SDK ([modelcontextprotocol/go-sdk](https://github.com/modelcontextprotocol/go-sdk)) is under heavy development. Meanwhile, [mark3labs/mcp-go](https://github.com/mark3labs/mcp-go)
+is a good alternative choice.
+
+[FastMCP](https://github.com/jlowin/fastmcp) is another well-maintained SDK in Python.
+
+
+### MCP Server Features and Capabilities
+
+An MCP server should include the following capabilities.
+SDK support varies; verify each requirement for your chosen language SDK or implement
+in your server.
 
 #### Read-Only Mode Support
-- **Hosting providers**: Prefer SDKs with read-only mode restrictions
-- **Security-first**: Choose SDKs that default to read-only operations
+Ensure that your MCP Server can be deployed with just read-only tools.
+ 
+Provide options to enable write/edit tools but pair them with sufficient
+authn/authz.
+
+- **Hosting providers**: Use SDK support for read-only mode restrictions
 - **Granular control**: Select SDKs with fine-grained permission controls
 
-#### Dynamic Toolset Selection
+#### Static/Dynamic Toolset Selection
+
+Effective context management is essential to ensure large language models (LLMs) perform well. Avoid overloading them with too many tools. Design MCP
+servers so toolsets can be enabled or disabled statically or dynamically.
+
 - **Runtime configuration**: SDKs that support tool registration at runtime
 - **Conditional tools**: Ability to enable/disable tools based on permissions
 - **Context-aware tools**: Tools that adapt based on user authentication
 
 #### Authentication/Authorization Support
+
+Implement the OAuth 2.0 authorization flows defined in the [MCP specification](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization).
+
 - **OAuth 2.0**: Built-in OAuth flow handling
 - **API key management**: Secure credential storage and rotation
 - **Scope management**: Granular permission scopes per tool
 - **Token exchange**: Support for token refresh and exchange patterns
 
-### SDK Comparison Matrix
-
-| Feature | Python SDK | JavaScript SDK | Go SDK |
-|---------|------------|----------------|--------|
-| Read-only mode | ✅ | ✅ | ✅ |
-| Dynamic tools | ✅ | ✅ | ⚠️ Limited |
-| OAuth 2.0 | ✅ | ✅ | ✅ |
-| Built-in auth | ✅ | ⚠️ Partial | ⚠️ Partial |
-| Scope management | ✅ | ✅ | ✅ |
-
 ## Tool and Prompt Description Guidance
 
 ### Writing Effective Tool Descriptions
+
 Follow these principles for tool descriptions:
 
 #### Be Specific and Actionable
+
 ```json
 // ❌ Bad: Vague description
 {
@@ -52,6 +71,7 @@ Follow these principles for tool descriptions:
 ```
 
 #### Include Context and Constraints
+
 ```json
 {
   "name": "create_github_issue",
@@ -80,8 +100,26 @@ Follow these principles for tool descriptions:
 }
 ```
 
+#### Design Tool Descriptions to Suggest Next Steps
+
+```json
+// ❌ Bad: Vague description
+{
+  "name": "start_pod",
+  "description": "Start a Kubernetes pod."
+}
+
+// ✅ Good: Specific and clear
+{
+  "name": "pod_start",
+  "description": "Start a Kubernetes pod. You can run pod_status tool to check if it started successfully."
+}
+```
+
 #### Reference Existing Documentation
+
 For tool descriptions, refer to:
+
 - [Anthropic's MCP documentation](https://modelcontextprotocol.io/docs)
 - [Tool design patterns](https://github.com/anthropics/mcp-examples)
 - Industry-specific API documentation
@@ -89,6 +127,7 @@ For tool descriptions, refer to:
 ### Managing State in MCP Servers
 
 #### Stateless by Default
+
 ```python
 # ✅ Good: Stateless operation
 @server.call_tool()
@@ -100,6 +139,7 @@ async def get_user_profile(name: str, arguments: dict):
 ```
 
 #### External State Management
+
 ```python
 # ✅ Good: External state storage
 class StatefulMCPServer:
@@ -121,6 +161,7 @@ class StatefulMCPServer:
 ## Testing Strategy
 
 ### Evaluation with Models
+
 Test your MCP server with both hosted and local models:
 
 ```python
@@ -144,7 +185,13 @@ async def test_with_models():
         assert "test" in str(result)
 ```
 
+### Evaluation Frameworks
+
+Use evaluation platforms such as [MCP Evals](https://www.mcpevals.io/) to measure
+and track the performance of your MCP server and its tools with LLMs over time.
+
 ### Linting and Static Analysis
+
 Implement comprehensive code quality checks:
 
 ```yaml
@@ -174,20 +221,24 @@ jobs:
 ## Curated Catalog
 
 ### What is a Curated Catalog?
+
 A curated catalog is a vetted collection of MCP servers approved for organizational use.
 
 #### Internal Catalogs
+
 - **Company-specific**: Internal MCP servers for organizational tools
 - **Security reviewed**: All servers undergo security assessment
 - **Compliance checked**: Servers meet regulatory requirements
 - **Usage tracked**: Monitor adoption and performance
 
 #### External Catalogs
+
 - **Public repositories**: Community-maintained MCP server collections
 - **Vendor catalogs**: Official servers from service providers
 - **Industry-specific**: Specialized servers for specific domains
 
 ### Example Catalog Structure
+
 ```yaml
 # catalog.yaml
 servers:
@@ -211,6 +262,7 @@ servers:
 ## Tool Filtering and Guardrails
 
 ### Production Tool Filtering
+
 Never provide agents with tools that can cause irreversible changes in production:
 
 ```python
@@ -234,6 +286,7 @@ class ProductionToolFilter:
 ```
 
 ### Sequencing Tools with Guardrails
+
 Implement approval workflows for sensitive operations:
 
 ```python
@@ -254,6 +307,7 @@ async def execute_with_guardrails(tool_name: str, arguments: dict):
 ## Model Selection and Experience
 
 ### Model Performance by Task Type
+
 Different models excel at different MCP operations:
 
 | Task Type | Best Models | Notes |
@@ -264,6 +318,7 @@ Different models excel at different MCP operations:
 | API integration | Claude-3.5 Sonnet | Excellent at following API specifications |
 
 ### Context Size Considerations
+
 - **Large context models**: Better for complex multi-step operations
 - **Small context models**: Suitable for simple, focused tasks
 - **Context management**: Implement context window optimization
@@ -284,9 +339,11 @@ def optimize_context(messages: List[Message], max_tokens: int) -> List[Message]:
 ## Product Support Lifecycle
 
 ### Managing Spec Evolution
+
 The MCP specification evolves rapidly while product lifecycles are long:
 
 #### Version Strategy
+
 ```yaml
 mcp_compatibility:
   supported_versions: ["2024-11-05", "2025-06-18"]
@@ -300,12 +357,14 @@ product_lifecycle:
 ```
 
 #### Adaptation Strategies
+
 - **Graceful degradation**: Handle unknown protocol features
 - **Feature detection**: Test for capability support at runtime
 - **Backward compatibility**: Support multiple protocol versions
 - **Regular updates**: Plan quarterly compatibility updates
 
 ### Developer Preview Recommendations
+
 Given the evolving nature of MCP:
 
 - **Community support only**: Don't provide enterprise SLA during preview
@@ -328,9 +387,11 @@ async def check_server_capabilities():
 ## The MCP Host Application
 
 ### Key Security Features for Client Applications
+
 Host applications must implement these security features:
 
 #### Tool Description Transparency
+
 Always show complete tool descriptions to users to prevent rug pulls and shadowing:
 
 ```python
@@ -348,6 +409,7 @@ def display_tool_info(tool: Tool):
 ```
 
 #### Request Approval for Tool Use
+
 Implement user approval workflows for sensitive operations:
 
 ```python
@@ -382,6 +444,7 @@ class ToolApprovalSystem:
 ```
 
 #### Tool Shadowing Prevention
+
 Detect and prevent malicious tools that mimic safe operations:
 
 ```python
@@ -407,6 +470,7 @@ def detect_tool_shadowing(new_tool: Tool, existing_tools: List[Tool]) -> List[st
 Ensure your inputs and outputs are sanitized. In Python, we recommend using Pydantic V2.
 
 ## 📦 Self-Containment
+
 Each MCP server must be a **standalone repository** that includes all necessary code and documentation.
 Example: `git clone; make serve`
 
@@ -469,7 +533,7 @@ Make targets are grouped by functionality. Use `make help` to see them all in yo
 
 Each repo must include a `Containerfile` (Podman-compatible, Docker-compatible) to support containerized execution.
 
-### Containerfile Requirements:
+### Containerfile Requirements
 
 - Must start from a secure base (e.g., latest Red Hat UBI9 minimal image `registry.access.redhat.com/ubi9-minimal:9.5-1741850109`)
 - Should use `uv` or `pdm` to install dependencies via `pyproject.toml`
@@ -478,17 +542,20 @@ Each repo must include a `Containerfile` (Podman-compatible, Docker-compatible) 
 - Should define a non-root user for runtime
 
 ## 📚 Dependency Management
+
 - All Python projects must use `pyproject.toml` and follow PEP standards.
 - Dependencies must either be:
   - Included in the repo
   - Pulled from PyPI (no external links)
 
 ## 🎯 Clear Role Definition
+
 - State the **specific role** of the server (e.g., GitHub tools).
 - Group related tools together.
 - **Do not mix roles** (e.g., GitHub ≠ Jira ≠ GitLab).
 
 ## 🧰 Standardized Tools
+
 Each MCP server should expose tools that follow the MCP conventions, e.g.:
 
 - `create_ticket`
@@ -496,9 +563,10 @@ Each MCP server should expose tools that follow the MCP conventions, e.g.:
 - `read_file`
 
 ## 📁 Consistent Structure
+
 Repos must follow a common structure. For example, from the time_server
 
-```
+```text
 time_server/
 ├── Containerfile                  # Container build definition (Podman/Docker compatible)
 ├── Makefile                       # Build, run, test, and container automation targets
@@ -524,6 +592,7 @@ time_server/
 ```
 
 ## 📝 Documentation
+
 Each repo must include:
 
 - A comprehensive `README.md`
@@ -531,12 +600,15 @@ Each repo must include:
 - Environment variable documentation
 
 ## 🧩 Modular Design
+
 Code should be cleanly separated into modules for easier maintenance and scaling.
 
 ## ✅ Testing
+
 Include **unit and integration tests** to validate functionality.
 
 ## 🤝 Contribution Guidelines
+
 Add a `CONTRIBUTING.md` with:
 
 - How to file issues
@@ -544,10 +616,12 @@ Add a `CONTRIBUTING.md` with:
 - Review and merge process
 
 ## 🏷 Versioning and Releases
+
 Use **semantic versioning**.
 Include **release notes** for all changes.
 
 ## 🔄 Pull Request Process
+
 Submit new MCP servers via **pull request** to the org's main repo.
 PR must:
 
@@ -555,6 +629,7 @@ PR must:
 - Include all documentation
 
 ## 🔐 Environment Variables and Secrets
+
 - Use environment variables for secrets
 - Use a clear, role-based prefix (e.g., `MCP_GITHUB_`)
 
@@ -569,7 +644,7 @@ MCP_GITHUB_BASE_URL=...
 
 Add tags at the top of `README.md` between YAML markers to declare your server's required capabilities.
 
-### Available Tags:
+### Available Tags
 
 - **`needs_filesystem_access`**
   Indicates the server requires access to the local filesystem (e.g., for reading/writing files).
@@ -589,7 +664,7 @@ Add tags at the top of `README.md` between YAML markers to declare your server's
 - **`needs_network_access_outbound`**
   The server needs to make outbound network requests (e.g., calling external APIs or services).
 
-### Example:
+### Example
 
 ```markdown
 ---
