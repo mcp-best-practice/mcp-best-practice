@@ -1,4 +1,5 @@
 nav:
   - "Best Practices Guide": mcp-best-practices.md
+  - "Architecture, Security & Operations": architecture-security-ops.md
   - "When to Use MCP": when-to-use-mcp.md
   - "Design Principles": principles.md
