@@ -1,8 +1,2 @@
 nav:
-  - "MCP at a Glance": at-a-glance.md
   - "Introduction": index.md
-  - "Server Anatomy": server-anatomy.md
-  - "Architecture": architecture.md
-  - "Core Concepts": core-concepts.md
-  - "Standards": standards.md
-  - "Getting Started": getting-started.md

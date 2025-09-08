@@ -7,7 +7,7 @@ nav:
   - "📦 Package": package
   - "🚀 Deploy": deploy
   - "⚙️ Operate": operate
-  - "🔧 Manage": manage
   - "🛡️ Secure": secure
   - "🔌 Use": use
+  - "🙌 Contribute": contribute.md
 #  - "❓ FAQ": faq

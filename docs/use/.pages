@@ -1,6 +1,2 @@
 nav:
-  - "Integration Guide": index.md
-  - "Claude Integration": claude.md
-  - "Gateway Integration": gateway.md
-  - "API Clients": api-clients.md
-  - "Webhooks": webhooks.md
+  - "Use": index.md
