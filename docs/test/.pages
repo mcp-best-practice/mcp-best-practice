@@ -1,7 +1,2 @@
 nav:
-  - "Testing Guide": index.md
-  - "Unit Testing": unit-testing.md
-  - "Integration Testing": integration-testing.md
-  - "End-to-End Testing": e2e-testing.md
-  - "Performance Testing": performance-testing.md
-  - "Security Testing": security-testing.md
+  - "Test": index.md

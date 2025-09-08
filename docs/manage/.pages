@@ -1,7 +1,0 @@
-nav:
-  - "Management Guide": index.md
-  - "Lifecycle Management": lifecycle.md
-  - "Versioning": versioning.md
-  - "Monitoring": monitoring.md
-  - "Updates": updates.md
-  - "Rollback": rollback.md

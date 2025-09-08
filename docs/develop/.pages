@@ -1,9 +1,2 @@
 nav:
-  - "Development Guide": index.md
-  - "Python": python
-  - "JavaScript/TypeScript": javascript
-  - "Go": go
-  - "Rust": rust
-  - "Tutorials": tutorials
-  - "Patterns": patterns.md
-  - "Tools": tools.md
+  - "Develop": index.md

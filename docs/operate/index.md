@@ -1,204 +1,57 @@
-# Operations Guide
+# Operate (Lifecycle & Management)
 
-## Operating MCP Servers in Production
-
-Effective operations ensure MCP servers maintain high availability, performance, and reliability in production environments.
+Operate MCP servers with consistent lifecycle management, observability, and governance. This page combines operations and management into one high‑level guide.
 
 ## Operational Excellence
 
 ### Key Principles
-1. **Observability** - Monitor, log, trace everything
-2. **Automation** - Automate repetitive tasks
-3. **Reliability** - Design for failure
-4. **Performance** - Optimize continuously
-5. **Security** - Defense in depth
+- Observability: standardized logs, metrics, and tracing; correlate via request IDs and gateway.
+- Automation: automate rollouts, scaling, and remediation; codify runbooks.
+- Reliability: design for failure; use circuit breakers and graceful degradation.
+- Performance: set SLOs; monitor and optimize continuously.
+- Security: defense in depth at runtime (policies, approvals, least privilege).
 
 ## Operational Readiness
 
 ### Pre-Production Checklist
-- [ ] Monitoring dashboards configured
-- [ ] Alerts and notifications set up
-- [ ] Logging pipeline established
-- [ ] Backup and recovery tested
-- [ ] Runbooks documented
-- [ ] On-call rotation scheduled
-- [ ] Incident response plan ready
-- [ ] Capacity planning completed
+- Monitoring dashboards and alerts configured
+- Logging, tracing, and metrics standardized (OpenTelemetry)
+- Backup and recovery tested for any externalized state
+- Runbooks documented; on‑call rotation and incident response in place
+- Capacity planning completed (load/burst and dependency failure modes tested)
 
 ## Monitoring Strategy
 
-### Four Golden Signals
-1. **Latency** - Response time
-2. **Traffic** - Request rate
-3. **Errors** - Failure rate
-4. **Saturation** - Resource utilization
+### Signals and Metrics
+- Four signals: latency, traffic, errors, saturation
+- Key metrics: tool success rate, p95 latency, error classes, approvals/policy denials, cost/quotas, dependency health
 
-### Key Metrics
-```python
-# Application metrics
-mcp_requests_total
-mcp_request_duration_seconds
-mcp_errors_total
-mcp_active_connections
-
-# System metrics
-cpu_utilization_percent
-memory_usage_bytes
-disk_io_operations
-network_throughput_bytes
-
-# Business metrics
-tools_executed_total
-resources_accessed_total
-user_sessions_active
-api_quota_remaining
-```
+Health/readiness endpoints should include dependency checks with timeouts and fallbacks.
 
 ## Health Checks
 
-### Liveness Probe
-```python
-@app.route('/health/live')
-def liveness():
-    """Basic liveness check - is the process running?"""
-    return {'status': 'alive'}, 200
-```
-
-### Readiness Probe
-```python
-@app.route('/health/ready')
-def readiness():
-    """Readiness check - can we serve traffic?"""
-    checks = {
-        'database': check_database_connection(),
-        'cache': check_cache_connection(),
-        'dependencies': check_external_services()
-    }
-    
-    if all(checks.values()):
-        return {'status': 'ready', 'checks': checks}, 200
-    else:
-        return {'status': 'not_ready', 'checks': checks}, 503
-```
+## Logging and Aggregation
+- Prefer structured logs; ensure correlation IDs are present and consistent.
+- Centralize log aggregation; redact sensitive fields; retain searchable audits (who/what/when/why).
 
 ## Logging Best Practices
 
-### Structured Logging
-```python
-import structlog
-
-logger = structlog.get_logger()
-
-def process_request(request_id, tool_name, params):
-    logger.info(
-        "request_started",
-        request_id=request_id,
-        tool=tool_name,
-        params_size=len(str(params))
-    )
-    
-    try:
-        result = execute_tool(tool_name, params)
-        logger.info(
-            "request_completed",
-            request_id=request_id,
-            tool=tool_name,
-            duration_ms=elapsed_time,
-            result_size=len(str(result))
-        )
-        return result
-        
-    except Exception as e:
-        logger.error(
-            "request_failed",
-            request_id=request_id,
-            tool=tool_name,
-            error=str(e),
-            error_type=type(e).__name__
-        )
-        raise
-```
-
-### Log Aggregation
-```yaml
-# Fluentd configuration
-<source>
-  @type tail
-  path /var/log/mcp-server/*.log
-  pos_file /var/log/td-agent/mcp-server.pos
-  tag mcp.server
-  <parse>
-    @type json
-  </parse>
-</source>
-
-<match mcp.**>
-  @type elasticsearch
-  host elasticsearch.example.com
-  port 9200
-  logstash_format true
-  logstash_prefix mcp
-  <buffer>
-    @type file
-    path /var/log/td-agent/buffer/mcp
-    flush_interval 10s
-  </buffer>
-</match>
-```
+## Lifecycle Management
+- Curated catalog: only deploy approved servers; require SBOMs, provenance, signatures, and scans.
+- Approval workflow: registration, promotion, ownership, SLOs; immutable audit trails.
+- Multi‑tenancy: per‑tenant isolation for configs, logs, metrics, and limits; tenant‑aware authZ.
+- External/remote servers: govern through a gateway/proxy; document constraints and SLAs.
 
 ## Performance Management
 
-### Performance Baseline
-```python
-# Establish baseline metrics
-PERFORMANCE_BASELINE = {
-    'p50_latency_ms': 100,
-    'p95_latency_ms': 500,
-    'p99_latency_ms': 1000,
-    'error_rate_percent': 0.1,
-    'requests_per_second': 1000
-}
+## SLOs and Incident Response
+- Baselines (tune to context): tool success rate ≥ 99.0% monthly; p95 ≤ 400 ms.
+- Incident taxonomy: availability, latency, correctness, security, quota/budget.
+- Flow: detect → triage (blast radius) → mitigate (degrade/circuit break) → RCA → fix/rollback → catalog learnings.
 
-def check_performance():
-    current_metrics = get_current_metrics()
-    
-    for metric, baseline in PERFORMANCE_BASELINE.items():
-        current = current_metrics[metric]
-        if current > baseline * 1.5:  # 50% degradation
-            alert(f"Performance degradation: {metric} = {current}")
-```
-
-### Performance Tuning
-```python
-# Connection pooling
-from sqlalchemy import create_engine
-
-engine = create_engine(
-    DATABASE_URL,
-    pool_size=20,
-    max_overflow=10,
-    pool_pre_ping=True,
-    pool_recycle=3600
-)
-
-# Caching strategy
-from functools import lru_cache
-import redis
-
-redis_client = redis.Redis(decode_responses=True)
-
-@lru_cache(maxsize=1000)
-def get_cached_result(key):
-    # Memory cache first
-    result = redis_client.get(key)
-    if result:
-        return json.loads(result)
-    
-    # Compute if not cached
-    result = compute_expensive_operation(key)
-    redis_client.setex(key, 3600, json.dumps(result))
-    return result
-```
+## Tooling and Automation
+- Prefer a single operator/controller framework across teams; standardize Helm/operator usage.
+- Version operations configs; keep runbooks up to date; exercise disaster recovery basics.
 
 ## Capacity Planning
 

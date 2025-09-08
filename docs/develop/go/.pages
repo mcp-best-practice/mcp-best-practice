@@ -1,7 +1,0 @@
-nav:
-  - "Go Overview": index.md
-  - "Project Structure": structure.md
-  - "Implementation": implementation.md
-  - "Testing": testing.md
-  - "Building": building.md
-  - "Best Practices": best-practices.md

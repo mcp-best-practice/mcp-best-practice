@@ -1,5 +1,0 @@
-nav:
-  - "FAQ": index.md
-  - "Troubleshooting": troubleshooting.md
-  - "Common Patterns": patterns.md
-  - "Migration Guide": migration.md

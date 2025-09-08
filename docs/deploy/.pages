@@ -1,7 +1,2 @@
 nav:
-  - "Deployment Guide": index.md
-  - "Cloud Deployment": cloud.md
-  - "On-Premise": on-premise.md
-  - "Kubernetes": kubernetes.md
-  - "CI/CD": cicd.md
-  - "Edge Deployment": edge.md
+  - "Deploy": index.md

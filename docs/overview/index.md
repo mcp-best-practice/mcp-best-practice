@@ -29,10 +29,3 @@ MCP enables AI assistants to interact with external systems through a well-defin
 2. **MCP Clients**: Connect to servers and utilize their capabilities
 3. **MCP Gateway**: Central hub for managing multiple MCP servers
 4. **Transport Layer**: Communication protocols (STDIO, HTTP, WebSocket)
-
-## Quick Navigation
-
-- 🏗️ [Architecture](architecture.md) - System design and components
-- 🔑 [Core Concepts](core-concepts.md) - Fundamental MCP concepts
-- 📋 [Standards](standards.md) - MCP protocol standards
-- 🚦 [Getting Started](getting-started.md) - Quick start guide

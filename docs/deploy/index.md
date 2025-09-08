@@ -1,64 +1,23 @@
 # Deployment Guide
 
-## Deploying MCP Servers to Production
+Deploy MCP servers with a gateway in front for centralized control, and run on hardened container platforms with strong isolation and guardrails.
 
-This guide covers deployment strategies, platforms, and best practices for running MCP servers in production environments.
+## Recommended Topology
 
-## Deployment Patterns
+ - MCP Gateway in front of your servers as a single pane of glass: centralized authN/Z, routing, quotas, catalogs, policy enforcement, and audit correlation.
+ - Separate environments (dev/stage/prod) with distinct credentials, routes, policies, and quotas; prevent cross‑environment data leakage.
 
-### Local vs Remote Deployment
+## Platform Guidance
 
-#### Local Deployment
-- **Use Cases**: Development, testing, trusted environments
-- **Transport**: STDIO with optional HTTP wrapper
-- **Security**: Container isolation, syscall restrictions
-- **Benefits**: Lower latency, offline capability
+ - Container platform (Kubernetes/OpenShift) with:
+   - Hardened images (minimal base, non‑root), signed artifacts, SBOMs, and vulnerability scanning.
+   - Runtime sandboxing (gVisor, Kata Containers) and OS controls (seccomp, SELinux/AppArmor, cgroups).
+   - Network policies (least privilege egress/ingress), mTLS service‑to‑service, and managed secrets.
+   - Autoscaling based on SLOs; quotas per tenant; resource requests/limits enforced.
 
-#### Remote Deployment  
-- **Use Cases**: Production, shared services, untrusted environments
-- **Transport**: Streamable HTTP (recommended)
-- **Security**: TLS, authentication, network isolation
-- **Benefits**: Scalability, centralized management
-
-### Deployment Strategies
-
-#### Rainbow Rollout Strategy
-Gradual deployment across multiple environments:
-```yaml
-environments:
-  development:
-    percentage: 100%
-    duration: immediate
-    validation: basic_tests
-    
-  staging:
-    percentage: 100% 
-    duration: 2h
-    validation: integration_tests
-    
-  canary:
-    percentage: 5%
-    duration: 4h
-    validation: performance_monitoring
-    
-  production:
-    percentage: 100%
-    duration: 24h
-    validation: full_monitoring
-```
-
-#### High Availability Deployment
-```yaml
-high_availability:
-  replicas: 3
-  anti_affinity: true
-  zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
-  load_balancing: round_robin
-  health_checks:
-    enabled: true
-    interval: 30s
-    failure_threshold: 3
-```
+## Rollout Strategies
+ - Canary and blue‑green with fast rollback and kill switches; monitor p95 latency, error rates, and policy denials during rollout.
+ - Shadow traffic where feasible to compare behavior before promotion.
 
 ### Blue-Green Deployment
 Switch between two identical production environments:
@@ -102,63 +61,14 @@ deployment:
   max_unavailable: 0
 ```
 
-## Container Packaging
+## Packaging and Supply Chain
 
-### Signed Container Images
-Always use containers signed by trusted providers:
+ - Package MCP servers as containers for production; sign and verify images; maintain SBOMs and provenance; use curated catalogs and verified registries only.
 
-```bash
-# Sign container with cosign
-cosign sign --key cosign.key mcp-server:latest
-
-# Verify container signature
-cosign verify --key cosign.pub mcp-server:latest
-
-# Use admission controllers to enforce signature verification
-kubectl apply -f - <<EOF
-apiVersion: v1
-kind: Policy
-metadata:
-  name: require-signed-images
-spec:
-  rules:
-  - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["create"]
-  admissionReviewVersions: ["v1", "v1beta1"]
-  sideEffects: None
-  rules:
-  - operations: ["CREATE"]
-    resources: ["pods"]
-    admissionReviewVersions: ["v1"]
-EOF
-```
-
-### Trusted Repositories
-Download MCP servers only from verified sources:
-
-- **Official registries**: Docker Hub, ECR, GCR with verified publishers
-- **Organization registries**: Internal container registries with signing
-- **Curated catalogs**: Company-approved MCP server collections
-
-### Container Security
-```dockerfile
-# Multi-stage build for minimal attack surface
-FROM golang:1.21-alpine AS builder
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o server
-
-# Minimal runtime image
-FROM scratch
-COPY --from=builder /app/server /server
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-USER 10001:10001
-EXPOSE 8000
-ENTRYPOINT ["/server"]
-```
+## Pre‑Deployment Readiness
+ - Tests passing; security scans complete; dependencies pinned and current; version tagged.
+ - Monitoring and alerting wired; dashboards ready; health/readiness endpoints validated.
+ - Configuration and secrets stored securely; network and DNS configured; change plan and rollback steps approved.
 
 ## Deployment Platforms
 
