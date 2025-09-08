@@ -15,21 +15,13 @@ Thank you for your interest in contributing to the MCP Best Practices Guide! Thi
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork locally:**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/mcp-best-practice.git
-   cd mcp-best-practice
-   ```
+   
 
 3. **Set up the development environment:**
-   ```bash
-   make venv
-   . ~/.venv/mcp-best-practice/bin/activate
-   ```
+   
 
 4. **Start the local development server:**
-   ```bash
-   make serve
-   ```
+   
    This will serve the documentation at http://127.0.0.1:8003/
 
 ## How to Contribute
@@ -42,17 +34,12 @@ Thank you for your interest in contributing to the MCP Best Practices Guide! Thi
    - Create a new issue if your contribution doesn't have one
 
 2. **Create a branch** for your changes:
-   ```bash
-   git checkout -b feature/your-contribution-name
-   ```
+   
 
 3. **Make your changes** following the guidelines below
 
 4. **Test locally** using the Makefile:
-   ```bash
-   make serve  # Test the development server
-   make build  # Test the build process
-   ```
+   
 
 5. **Submit a pull request** when ready
 
@@ -62,16 +49,8 @@ Thank you for your interest in contributing to the MCP Best Practices Guide! Thi
 Mark your pages clearly with status indicators:
 
 **Draft pages:**
-```markdown
-!!! warning "Draft"
-    This page is under development and content may change.
-```
 
 **Ready pages:**
-```markdown
-!!! success "Ready"
-    This page is ready for review and use.
-```
 
 #### Navigation Management
 - Add new pages to the appropriate section in `mkdocs.yml`
@@ -113,19 +92,6 @@ Mark your pages clearly with status indicators:
 ## Building and Testing
 
 ### Local Development
-```bash
-# Activate virtual environment
-. ~/.venv/mcp-best-practice/bin/activate
-
-# Serve locally with auto-reload
-make serve
-
-# Build the documentation
-make build
-
-# Clean generated files
-make clean
-```
 
 ### Available Make Targets
 - `make venv` - Create/recreate virtual environment
@@ -185,10 +151,9 @@ make clean
 ## Recognition
 
 Contributors are recognized through:
+
 - Attribution in commit messages and release notes
 - GitHub contributor graphs and statistics
 - Community acknowledgment in documentation
 
 ---
-
-Thank you for contributing to the MCP Best Practices Guide! Your efforts help the entire MCP community build better, more reliable integrations.

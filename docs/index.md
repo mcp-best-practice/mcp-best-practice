@@ -1,10 +1,6 @@
 # MCP Best Practices Guide
 
-!!! warning "Work in Progress"
-
-## Welcome to the Model Context Protocol Best Practices Guide
-
-This comprehensive guide provides best practices, patterns, and practical guidance for developing, deploying, and maintaining Model Context Protocol (MCP) servers in production environments.
+This guide provides high‑level, vendor‑neutral guidance for building, deploying, and operating MCP servers in production. It emphasizes principles and patterns over framework specifics, and favors simple, observable, secure designs that scale.
 
 ## What is MCP?
 
@@ -12,48 +8,19 @@ The Model Context Protocol (MCP) is an open protocol that standardizes how appli
 
 ## What This Guide Covers
 
-This guide is organized into practical sections that cover the entire MCP server lifecycle:
+The guide is organized into practical sections that mirror the MCP server lifecycle.
 
-### 🧭 **Overview**
-Start here for high-level concepts and decision points:
-- [MCP at a Glance](overview/at-a-glance.md) — executive summary and checklists
-- [Architecture](overview/architecture.md) — system design and components
-- [Core Concepts](overview/core-concepts.md) — tools, resources, prompts
-- [Standards](overview/standards.md) — protocol standards
-- [Getting Started](overview/getting-started.md) — your first server
-Get started with MCP fundamentals, architecture, and core concepts. Learn about the protocol standards and set up your first server.
-
-### ⭐ **Best Practices**
-Essential standards for robust MCP servers:
-- [Best Practices Guide](best-practice/mcp-best-practices.md)
-- [Architecture, Security & Operations](best-practice/architecture-security-ops.md)
-
-### 💻 **Development**
-Language-specific guides for Python, JavaScript/TypeScript, and Go with real-world examples, patterns, and implementation details.
-
-### 🧪 **Testing**
-Comprehensive testing strategies including unit, integration, and end-to-end testing approaches for MCP servers.
-
-### 📦 **Packaging**
-How to package and distribute MCP servers using language-specific package managers and container technologies.
-
-### 🚀 **Deployment**
-Deployment strategies for cloud platforms, on-premise environments, Kubernetes, and CI/CD pipelines.
-
-### ⚙️ **Operations**
-Production operations including monitoring, logging, performance optimization, scaling, and incident response.
-
-### 🔧 **Management**
-Lifecycle management covering versioning, updates, rollbacks, and configuration management.
-
-### 🛡️ **Security**
-Security best practices including authentication, authorization, secrets management, and vulnerability scanning.
-
-### 🔌 **Integration**
-How to integrate MCP servers with Claude Desktop, gateways, and other AI applications and platforms.
-
-### ❓ **FAQ**
-Common questions, troubleshooting guides, and migration assistance.
+| Section | Focus | Key Topics |
+|---|---|---|
+| 🧭 Overview | What MCP is and where it fits | Core building blocks; when to use MCP; success factors |
+| ⭐ Best Practices | Principles that stand the test of production | Single responsibility; contracts‑first; additive change; stateless defaults |
+| 💻 Develop | Building servers with discipline | Outcomes and contracts; observability from day one; least‑privilege integrations |
+| 🧪 Test | Validating behavior and quality | Unit/integration/E2E; evals and baselines; coverage and CI gates |
+| 📦 Package | Reliable distribution and supply chain integrity | Containers; SBOMs and signing; provenance; trusted catalogs |
+| 🚀 Deploy | Topology and platform guidance | Gateway front‑door; environment separation; sandboxing; rollout strategies |
+| ⚙️ Operate | Lifecycle and day‑2 excellence | SLOs; monitoring and incident flow; catalog and approvals; multi‑tenancy |
+| 🛡️ Secure | Defense‑in‑depth for MCP | Identity and access; policy‑as‑code; runtime controls; continuous assurance |
+| 🔌 Use | How clients/hosts consume MCP | Host choices; gateway mediation; good‑citizen patterns |
 
 ## Who This Guide Is For
 
@@ -66,21 +33,17 @@ Common questions, troubleshooting guides, and migration assistance.
 
 If you're new to MCP, start with:
 
-1. **[Overview](overview/index.md)** - Learn MCP fundamentals and architecture
-2. **[Getting Started](overview/getting-started.md)** - Build your first MCP server
-3. **[Best Practices](best-practice/mcp-best-practices.md)** - Understand essential standards
-4. **[Development Guide](develop/index.md)** - Deep dive into implementation
+1. Overview — fundamentals and context
+2. Best Practices — essential standards
+3. Develop — building your first server
 
 ## Contributing
 
-This guide is community-driven. We welcome contributions, corrections, and improvements. The content reflects real-world experience and evolving best practices from the MCP community.
+This guide is community‑driven. We welcome contributions, corrections, and improvements. The content reflects real‑world experience and evolving best practices from the MCP community.
 
-## Protocol Information
+## Learn the Protocol
 
-- **Current Protocol Version**: 2025-06-18
-- **Transport Mechanisms**: stdio, Streamable HTTP
-- **Message Format**: JSON-RPC 2.0
-- **Official Specification**: [Model Context Protocol Specification](https://spec.modelcontextprotocol.io)
+For protocol details (transports, messages, discovery), refer to the official specification at https://spec.modelcontextprotocol.io. This guide assumes familiarity with the spec and focuses on how to apply it effectively in production.
 
 ---
 
