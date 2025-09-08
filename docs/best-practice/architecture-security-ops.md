@@ -61,3 +61,42 @@ For a deeper dive into design principles and when to use MCP, see:
 - Best Practices Guide
 - Design Principles
 - When to Use MCP
+
+## Environment Separation and Tenancy
+
+- Isolate dev/stage/prod with distinct credentials, routes, policies, and quotas. Prevent cross‑environment data leakage.
+- For multi‑tenant servers, partition configuration, logs, metrics, and rate limits per tenant; enforce strict tenant‑aware authorization.
+- Provide tenancy selectors in discovery responses when capabilities differ by tenant/environment.
+
+## Quotas, Budgets, and Cost Governance
+
+- Define per‑tenant and per‑tool quotas (request rate, concurrency, data volume). Alert on nearing limits; provide soft/hard caps.
+- Track cost drivers (API calls, egress, compute) per tenant. Expose budgets and consumption metrics; auto‑degrade non‑critical work when exceeding budget.
+
+## Dependency Protection
+
+- Bound concurrency per dependency; implement client‑side backoff with jitter; maintain allowlists per destination.
+- Validate third‑party responses (schemas, sizes, content types); protect downstreams from malformed or adversarial payloads.
+
+## Compatibility and Feature Detection
+
+- Expose server, tool, and schema versions; include feature flags in discovery to allow clients to adapt.
+- Maintain backward‑compatible changes where possible; sunset schedules for breaking changes.
+
+## Operational Readiness Checklist
+
+- Health/readiness endpoints; dependency checks with timeouts and fallbacks.
+- Structured logs with correlation IDs; metrics and traces hooked to dashboards and alerts.
+- Runbooks for common failures; on‑call rotation and escalation defined.
+- Disaster recovery basics: backups for critical state; restore drills; capacity reserves for failover.
+
+## Incident Taxonomy and Response
+
+- Categories: availability, latency, correctness (tool contract failures), security (authZ/policy denials), quota/budget breaches.
+- Response: detect → triage (blast radius) → mitigate (degrade/circuit break) → RCA → fix forward or rollback → learnings to catalog.
+
+## Example SLO Baselines (tune to your context)
+
+- Tool success rate ≥ 99.0% monthly; p95 latency ≤ 400 ms; error budget ≤ 1%.
+- Discovery p95 ≤ 150 ms; health/readiness p95 ≤ 50 ms.
+- Approval workflow p95 ≤ 2 s; policy engine p95 ≤ 100 ms.

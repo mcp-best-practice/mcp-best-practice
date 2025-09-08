@@ -15,10 +15,18 @@ The Model Context Protocol (MCP) is an open protocol that standardizes how appli
 This guide is organized into practical sections that cover the entire MCP server lifecycle:
 
 ### 🧭 **Overview**
+Start here for high-level concepts and decision points:
+- [MCP at a Glance](overview/at-a-glance.md) — executive summary and checklists
+- [Architecture](overview/architecture.md) — system design and components
+- [Core Concepts](overview/core-concepts.md) — tools, resources, prompts
+- [Standards](overview/standards.md) — protocol standards
+- [Getting Started](overview/getting-started.md) — your first server
 Get started with MCP fundamentals, architecture, and core concepts. Learn about the protocol standards and set up your first server.
 
 ### ⭐ **Best Practices**
-Essential standards for building robust, maintainable MCP servers including project structure, dependency management, and coding conventions.
+Essential standards for robust MCP servers:
+- [Best Practices Guide](best-practice/mcp-best-practices.md)
+- [Architecture, Security & Operations](best-practice/architecture-security-ops.md)
 
 ### 💻 **Development**
 Language-specific guides for Python, JavaScript/TypeScript, and Go with real-world examples, patterns, and implementation details.
