@@ -673,3 +673,26 @@ tags:
   - needs_api_key_user
 ---
 ```
+
+## 🛡 Defensive Programming
+
+**MCP Server logic should be developed defensively**, particularly when the MCP
+server enables write operations and destructive actions. This can be even more
+important if the MCP Server wraps another API. The Kubernetes API is a good
+example, as it is common for there to be few guardrails in front of destructive
+actions.
+
+> **Example**: If you have a Kubernetes API and a controller for managing
+> ingress Gateways, and you want to enable modification or deletion of Gateways
+> (and the controller does not have guardrails, it simply moves towards the
+> declared state) through an MCP Server, you should add defensive logic to your
+> MCP Server (e.g. "check if the Gateway has active routes serving production
+> traffic").
+
+**Take advantage of feedback mechanisms** (today, [elicitation] is one such
+mechanism) to increase the safety and reduce accidental destructive actions from
+agents. In general: Keep in mind when developing MCP Server logic which enables
+write ops and destructive actions, that the Agents which will utilize them do
+not possess human judgement.
+
+[elicitation]:https://modelcontextprotocol.io/specification/2025-06-18/client/elicitation
