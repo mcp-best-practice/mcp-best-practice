@@ -1,4 +1,4 @@
-# MCP Best Practices — Enterprise Guide
+# MCP Best Practices
 
 This guide provides high‑level, vendor‑neutral guidance for building, deploying, and operating MCP servers in production. It emphasizes principles and patterns that scale in enterprise environments, focusing on security, reliability, and maintainability.
 
@@ -187,25 +187,25 @@ Use an enterprise MCP Gateway when you need centralized security, control, and s
 
 ## Quick Build Checklist
 
-✅ **Purpose and scope**: Single, clearly defined server role and bounded toolset  
-✅ **SDK and spec**: Official SDK where possible; document SDK/spec versions  
-✅ **Security**: OAuth scopes, least-privilege tools, approvals for high-risk actions, secrets in a manager  
-✅ **Validation**: Strong input schemas, output sanitization, error taxonomy and retries with idempotency  
-✅ **Operations**: Health/readiness, rate limits, backpressure, circuit breakers, and basic SLOs  
-✅ **Observability**: Structured audit logs, metrics (success/latency/errors), tracing/correlation IDs  
-✅ **Compatibility**: Versioned tool schemas, deprecation policy, feature detection, contract tests  
-✅ **Packaging**: Minimal signed container, non‑root runtime, reproducible builds  
-✅ **Docs**: README with capabilities/tags, environment variables, runbooks, and changelog  
+✅ **Purpose and scope**: Single, clearly defined server role and bounded toolset
+✅ **SDK and spec**: Official SDK where possible; document SDK/spec versions
+✅ **Security**: OAuth scopes, least-privilege tools, approvals for high-risk actions, secrets in a manager
+✅ **Validation**: Strong input schemas, output sanitization, error taxonomy and retries with idempotency
+✅ **Operations**: Health/readiness, rate limits, backpressure, circuit breakers, and basic SLOs
+✅ **Observability**: Structured audit logs, metrics (success/latency/errors), tracing/correlation IDs
+✅ **Compatibility**: Versioned tool schemas, deprecation policy, feature detection, contract tests
+✅ **Packaging**: Minimal signed container, non‑root runtime, reproducible builds
+✅ **Docs**: README with capabilities/tags, environment variables, runbooks, and changelog
 
 ## Production Readiness Checklist
 
-✅ **Identity and authorization** implemented with least privilege and approvals for high-risk tools  
-✅ **Input validation, output sanitization, and policy guardrails** in place  
-✅ **Audit logging, metrics, and alerts** wired into enterprise observability  
-✅ **Rate limits, backpressure, health checks, and circuit breakers** configured  
-✅ **Secrets in a managed store**; containers minimal, signed, and non-root  
-✅ **Versioned APIs and tools** with clear deprecation paths and compatibility tests  
-✅ **Documented SLOs, runbooks, incident response, and rollback procedures**  
+✅ **Identity and authorization** implemented with least privilege and approvals for high-risk tools
+✅ **Input validation, output sanitization, and policy guardrails** in place
+✅ **Audit logging, metrics, and alerts** wired into enterprise observability
+✅ **Rate limits, backpressure, health checks, and circuit breakers** configured
+✅ **Secrets in a managed store**; containers minimal, signed, and non-root
+✅ **Versioned APIs and tools** with clear deprecation paths and compatibility tests
+✅ **Documented SLOs, runbooks, incident response, and rollback procedures**
 
 ## Enterprise Adoption Patterns
 
